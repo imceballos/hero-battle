@@ -1,7 +1,16 @@
+import os
+import sys
+import base64
 import random
+import requests
+
 from typing import List, Tuple, Dict, Any
 
-from api import request_info_hero
+current_folder = os.path.dirname(os.path.abspath(__file__))
+parent_folder = os.path.dirname(current_folder)
+sys.path.append(parent_folder)
+
+from business.api import request_info_hero
 
 class Team:
     def __init__(self, members):
@@ -49,7 +58,20 @@ class Team:
 class Battle:
     def __init__(self):
         self.teams = self.generate_teams()
+        self.info = self.generate_info()
         self.activity = []
+
+    def generate_info(self):
+        info = [
+            {"team_alignment": team.team_alignment, 
+            "members": [{
+                "name": hero.name,
+                "hp": hero.hp,
+                "alignment": hero.alignment,
+                "image": hero.image}
+                for hero in team.members]}
+                for team in self.teams]
+        return info
 
     def generate_teams(self) -> List[Team]:
         first_group = random.sample(range(1, 732), 5)
@@ -118,6 +140,10 @@ class Hero:
         self.durability = self.sanitize(powerstats.get("durability"))
         self.stamina = random.randint(0, 10)
         self.hp = self.get_hp()
+        self.image = self.get_image_base64(data.get("image").get("url"))
+
+    def get_image_base64(self, url):
+        return base64.b64encode(requests.get(url).content).decode("utf-8")
 
     def sanitize(self, value: Any) -> int:
         if value == "null":
@@ -136,8 +162,3 @@ class Hero:
 
     def __str__(self) -> str:
         return f"{self.name}, hp: {self.hp}, stamina: {self.stamina}"
-
-
-battle = Battle()
-battle.start_battle()
-print(battle.activity)

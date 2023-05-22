@@ -6,10 +6,7 @@ from fastapi.templating import Jinja2Templates
 from typing import List, Dict
 import os
 
-
-from datetime import datetime, timedelta
-import business as business
-
+from models.model import Battle
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -21,4 +18,8 @@ def index(request: Request):
     gets the list of files from the directory, creates a list of dictionaries with the name and size fields, and returns an HTML response
     with the generated file list
     """
-    return templates.TemplateResponse("index.html", {"request": request})
+    battle = Battle()
+    battle.start_battle()
+    hero_data = battle.info
+
+    return templates.TemplateResponse("index.html", {"request": request, "hero_data": hero_data})

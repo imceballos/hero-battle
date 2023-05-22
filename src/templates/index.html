@@ -1,65 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hero Battle Game</title>
+    <title>Spinning Heroes</title>
     <style>
+        body {
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
+
         .container {
+            margin-top: 50px;
             text-align: center;
         }
 
-        h1 {
-            color: #FF4500;
-        }
-
-        .hero-card {
-            border: 1px solid #000;
-            padding: 10px;
-            margin: 10px;
+        .section {
             display: inline-block;
-            text-align: center;
+            margin: 0 20px;
         }
 
-        .hero-card img {
-            width: 200px;
-            height: 200px;
+
+        .hero {
+            margin-top: 20px;
         }
 
-        .button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px;
+        .hero img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Hero Battle Game</h1>
-        
-        <div class="hero-card">
-            <h2>Hero 1</h2>
-            <p>Strength: 100</p>
-            <p>Speed: 80</p>
-            <p>Power: 90</p>
-            <p>Combat: 95</p>
-            <p>Intelligence: 85</p>
+        {% for section in hero_data %}
+        <div class="section" id="section-{{ loop.index }}">
+            <div>
+                <h2>Team Alignment: {{ section.team_alignment }}</h2>
+                {% for hero in section.members %}
+                <div class="hero">
+                    <img src="data:image/png;base64,{{ hero.image }}" alt="{{ hero.name }}">
+                    <p>Name: {{ hero.name }}</p>
+                    <p>HP: {{ hero.hp }}</p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-
-        <div class="hero-card">
-            <h2>Hero 2</h2>
-            <p>Strength: 95</p>
-            <p>Speed: 85</p>
-            <p>Power: 75</p>
-            <p>Combat: 90</p>
-            <p>Intelligence: 80</p>
-        </div>
-
-        <button class="button">Start Battle</button>
+        {% endfor %}
     </div>
 </body>
 </html>
