@@ -18,9 +18,34 @@ class Battle:
         return [first_team, second_team]
 
     def create_team(self, group):
-        print(group)
         return Team([Hero(i) for i in group])
 
+    def start_battle(self):
+        start, before = self.get_order()
+        while len(start.get_active_members()) and len(before.get_active_members()):
+            self.attack(start, before)
+            start, before = before, start
+        if start.get_active_members():
+            print(f"WINS {start}")
+        else:
+            print(f"WINS {before}")
+  
+
+    def get_order(self):
+        number = random.randint(0,1)
+        return self.teams[number], self.teams[1-number]
+
+    def attack(self, team_1, team_2):
+        attacker = random.choice(team_1.get_active_members())
+        receiver = random.choice(team_2.get_active_members())
+        return self.execute_attack(attacker, receiver)
+
+    def execute_attack(self, attacker, receiver):
+        damage = random.choice([attacker.mental_attack, attacker.strong_attack, attacker.fast_attack])
+        print(f"{attacker.name} attacks with {damage} to {receiver.name}")
+        receiver.hp = receiver.hp-damage if damage < receiver.hp else 0
+        if receiver.hp == 0:
+            print(f"{receiver.name} eliminated")
 
 class Team:
     def __init__(self, members):
@@ -30,7 +55,9 @@ class Team:
         self.set_fb()
 
     def get_active_members(self):
-        return [hero for hero in self.members if hero.hp>0]
+        self.active_members =  [hero for hero in self.members if hero.hp>0]
+        self.active = len(self.active_members)
+        return self.active_members
 
     def get_aligment(self):
         alignments = [hero.alignment for hero in self.members]
@@ -40,6 +67,7 @@ class Team:
         for hero in self.members:
             coef = 1 + random.randint(0,9)
             hero.fb = coef if hero.alignment==self.team_alignment else coef**-1
+        self.set_attack()
 
     def set_attack(self):
         for hero in self.members:
@@ -90,3 +118,5 @@ for team in battle.teams:
     print(team)
     for hero in team.members:
         print(hero)
+
+print(battle.start_battle())
