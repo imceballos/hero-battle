@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from dotenv import load_dotenv
 from typing import List, Dict
 import base64
 import json
@@ -13,7 +12,6 @@ from business.utils import format_message
 from business.api import  send_simple_message
 
 
-load_dotenv()
 
 
 app = FastAPI()
@@ -42,6 +40,10 @@ def send_email(content: List[File]):
     formatted_message = json.loads(decoded_data)
     recent_activity = [format_message(act) for act in formatted_message]
     content_message = " \n".join(recent_activity)
-    email = send_simple_message(content_message)
-    print()
-    print(email.json())
+    print(content_message)
+    try:
+        email = send_simple_message(content_message)
+        return {"message": f"Successfully sent"}
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}

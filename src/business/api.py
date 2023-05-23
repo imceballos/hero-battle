@@ -1,6 +1,10 @@
+from dotenv import load_dotenv
 import requests
+import os
 
 from typing import Dict, Any
+
+load_dotenv()
 
 def request_info_hero(id: int) -> Dict[str, Any]:
     return requests.get(
