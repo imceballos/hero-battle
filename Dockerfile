@@ -1,6 +1,7 @@
 FROM python:3.11.1-slim
 
 COPY ./requirements.txt /src/requirements.txt
+COPY .env /src/.env
 
 WORKDIR /src
 
