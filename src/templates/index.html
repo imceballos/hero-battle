@@ -24,6 +24,8 @@
             display: inline-block;
             margin: 0 20px;
             margin-right: 250px;
+            margin-left: 250px;
+
         }
 
         .hero {
@@ -44,6 +46,7 @@
 
         .hero-details {
             margin-left: 10px; 
+            align-items: left;
         }
 
         .attack-animation {
@@ -151,14 +154,14 @@
             if (hpElement) {
                 const currentHP = parseFloat(hpElement.textContent);
                 const newHP = currentHP - damage;
-                hpElement.textContent = newHP.toFixed(3);
+                hpElement.textContent = newHP.toFixed(1);
             }
         }
 
         function createAttackAnimation(damage, senderId, receiverId) {
             const attackAnimation = document.createElement('div');
             attackAnimation.classList.add('attack-animation');
-            attackAnimation.textContent = senderId +' attacks '+ receiverId + ': '+ damage.toFixed(3);
+            attackAnimation.textContent = senderId +' attacks '+ receiverId + ': '+ damage.toFixed(1);
             return attackAnimation;
         }
 

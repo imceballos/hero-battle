@@ -40,7 +40,6 @@ def send_email(content: List[File]):
     formatted_message = json.loads(decoded_data)
     recent_activity = [format_message(act) for act in formatted_message]
     content_message = " \n".join(recent_activity)
-    print(content_message)
     try:
         email = send_simple_message(content_message)
         return {"message": f"Successfully sent"}
