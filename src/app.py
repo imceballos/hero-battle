@@ -21,5 +21,6 @@ def index(request: Request):
     battle = Battle()
     battle.start_battle()
     hero_data = battle.info
-
-    return templates.TemplateResponse("index.html", {"request": request, "hero_data": hero_data})
+    activity = battle.activity
+    print(activity)
+    return templates.TemplateResponse("index.html", {"request": request, "hero_data": hero_data, "activity": activity})

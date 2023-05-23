@@ -18,9 +18,14 @@
             margin: 0 20px;
         }
 
-
         .hero {
-            margin-top: 20px;
+            margin-top: 10px;
+        }
+
+        
+        .hero-info {
+            display: flex;
+            align-items: center;
         }
 
         .hero img {
@@ -28,6 +33,38 @@
             height: 100px;
             border-radius: 50%;
         }
+
+        .hero-details {
+            margin-left: 10px; /* Adjust as needed */
+        }
+
+        .attack-animation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            animation: attackAnimation 1s ease-in-out;
+            }
+
+            @keyframes attackAnimation {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            }
     </style>
 </head>
 <body>
@@ -37,15 +74,92 @@
             <div>
                 <h2>Team Alignment: {{ section.team_alignment }}</h2>
                 {% for hero in section.members %}
-                <div class="hero">
-                    <img src="data:image/png;base64,{{ hero.image }}" alt="{{ hero.name }}">
-                    <p>Name: {{ hero.name }}</p>
-                    <p>HP: {{ hero.hp }}</p>
+                <div class="hero" id="{{ hero.name }}">
+                    <div class="hero-info">
+                        <img src="data:image/png;base64,{{ hero.image }}" alt="{{ hero.name }}">
+                        <div class="hero-details">
+                            <p>Name: {{ hero.name }}</p>
+                            <p class="hp">HP: {{ hero.hp }}</p>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endfor %}
     </div>
+    <button onclick="executeAttacks()">Execute Attacks</button>
 </body>
+
+<script>
+    function executeAttacks() {
+        const attacks = [
+            {% for attack in activity %}
+                {% if attack.name == "attack" %}
+                    {
+                        name: "{{ attack.name }}",
+                        action: {
+                            sender: "{{ attack.action.sender }}",
+                            receiver: "{{ attack.action.receiver }}",
+                            damage: {{ attack.action.damage }}
+                        }
+                    },
+                {% endif %}
+            {% endfor %}
+        ];
+
+        console.log(attacks);
+
+        const attackDelay = 1000;
+
+        function getHeroElement(heroId) {
+            return document.getElementById(heroId);
+        }
+
+        function updateHeroHP(heroElement, damage) {
+            const hpElement = heroElement.querySelector('.hp');
+            if (hpElement) {
+                const currentHP = parseFloat(hpElement.textContent);
+                const newHP = currentHP - damage;
+                hpElement.textContent = newHP.toFixed(2);
+            }
+        }
+
+        function createAttackAnimation(damage) {
+            const attackAnimation = document.createElement('div');
+            attackAnimation.classList.add('attack-animation');
+            attackAnimation.textContent = damage.toFixed(2);
+            return attackAnimation;
+        }
+
+        function executeAttack(attackIndex) {
+            if (attackIndex < attacks.length) {
+                const attack = attacks[attackIndex];
+                const senderId = attack.action.sender;
+                const receiverId = attack.action.receiver;
+                const senderElement = getHeroElement(senderId);
+                const receiverElement = getHeroElement(receiverId);
+
+                if (senderElement && receiverElement) {
+                    const damage = attack.action.damage;
+
+                    updateHeroHP(receiverElement, damage);
+
+                    const attackAnimation = createAttackAnimation(damage);
+                    senderElement.appendChild(attackAnimation);
+
+                    setTimeout(() => {
+                        attackAnimation.remove();
+                        executeAttack(attackIndex + 1);
+                    }, attackDelay);
+                } else {
+                    console.error(`Invalid sender or receiver ID for attack: ${JSON.stringify(attack)}`);
+                    executeAttack(attackIndex + 1);
+                }
+            }
+        }
+
+        executeAttack(0);
+    }
+</script>
 </html>
