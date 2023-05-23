@@ -1,6 +1,4 @@
-from fastapi import FastAPI, Request, Form, File, UploadFile, Depends, HTTPException, status
-from starlette.responses import RedirectResponse
-
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import List, Dict
@@ -10,7 +8,7 @@ import os
 
 from models.model import Battle
 from models.schema import File
-from business.utils import format_message
+from business.utils import format_message, send_simple_message
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -38,4 +36,4 @@ def send_email(content: List[File]):
     formatted_message = json.loads(decoded_data)
     recent_activity = [format_message(act) for act in formatted_message]
     content_message = " \n".join(recent_activity)
-    print(content_message)
+    send_simple_message(content_message)
