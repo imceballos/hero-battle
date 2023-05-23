@@ -7,15 +7,23 @@
             background-color: #f2f2f2;
             font-family: Arial, sans-serif;
         }
+        .team-alignment {
+            font-size: 18px;
+        }
 
         .container {
-            margin-top: 50px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .title {
             text-align: center;
         }
 
         .section {
             display: inline-block;
             margin: 0 20px;
+            margin-right: 250px;
         }
 
         .hero {
@@ -35,7 +43,7 @@
         }
 
         .hero-details {
-            margin-left: 10px; /* Adjust as needed */
+            margin-left: 10px; 
         }
 
         .attack-animation {
@@ -68,17 +76,18 @@
     </style>
 </head>
 <body>
+    <h1 class="title">Hero Battle Simulator</h1>
     <div class="container">
         {% for section in hero_data %}
         <div class="section" id="section-{{ loop.index }}">
             <div>
-                <h2>Team Alignment: {{ section.team_alignment }}</h2>
+                <h2 class="team-alignment">Team Alignment: {{ section.team_alignment }}</h2>
                 {% for hero in section.members %}
                 <div class="hero" id="{{ hero.name }}">
                     <div class="hero-info">
                         <img src="data:image/png;base64,{{ hero.image }}" alt="{{ hero.name }}">
                         <div class="hero-details">
-                            <p>Name: {{ hero.name }}</p>
+                            <p>{{ hero.name }}</p>
                             <p class="hp">HP: {{ hero.hp }}</p>
                         </div>
                     </div>
@@ -89,9 +98,32 @@
         {% endfor %}
     </div>
     <button onclick="executeAttacks()">Execute Attacks</button>
+    <button onclick="sendEmail('{{encoded_activity}}')">Send Email</button>
 </body>
 
 <script>
+    function sendEmail(activity) {
+        fetch('/send_email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify([{"activity": activity}])
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to update file status');
+            }
+        }).then(data => {
+            console.log(data.message);
+            location.reload(); // reload the page to update the file list
+        }).catch(error => {
+            console.error(error);
+            alert('Failed to update file status');
+        });
+    }
+    
     function executeAttacks() {
         const attacks = [
             {% for attack in activity %}
@@ -108,8 +140,6 @@
             {% endfor %}
         ];
 
-        console.log(attacks);
-
         const attackDelay = 1000;
 
         function getHeroElement(heroId) {
@@ -121,14 +151,14 @@
             if (hpElement) {
                 const currentHP = parseFloat(hpElement.textContent);
                 const newHP = currentHP - damage;
-                hpElement.textContent = newHP.toFixed(2);
+                hpElement.textContent = newHP.toFixed(3);
             }
         }
 
-        function createAttackAnimation(damage) {
+        function createAttackAnimation(damage, senderId, receiverId) {
             const attackAnimation = document.createElement('div');
             attackAnimation.classList.add('attack-animation');
-            attackAnimation.textContent = damage.toFixed(2);
+            attackAnimation.textContent = senderId +' attacks '+ receiverId + ': '+ damage.toFixed(3);
             return attackAnimation;
         }
 
@@ -143,10 +173,10 @@
                 if (senderElement && receiverElement) {
                     const damage = attack.action.damage;
 
-                    updateHeroHP(receiverElement, damage);
-
-                    const attackAnimation = createAttackAnimation(damage);
+                    const attackAnimation = createAttackAnimation(damage, senderId, receiverId);
                     senderElement.appendChild(attackAnimation);
+
+                    updateHeroHP(receiverElement, damage);
 
                     setTimeout(() => {
                         attackAnimation.remove();
