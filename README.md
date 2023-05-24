@@ -11,12 +11,19 @@ HP corresponde a los puntos de vida del personaje, los cuales se calculan en bas
 
 Especificaciones técnicas
 
+Actualmente el proyecto funciona en Google Cloud, en una VM, en la IP http://35.193.98.205
+
 Ejecución:
 
 - Dockerfile
 
+docker build -t imageName .
+
+docker run -p 80:80 imageName
 
 - Uvicorn
+
+uvicorn app:app --reload
 
 
 Módulo principal:
